@@ -62,7 +62,6 @@ loader = DataLoader(small_dataset, batch_size=64, shuffle=False)
 all_preds = []
 all_labels = []
 
-
 # Disables gradient calculations for inference
 with torch.no_grad():
     # TQDM progress bar for the evaluation loop
@@ -80,7 +79,7 @@ with torch.no_grad():
         all_preds.extend(preds.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
-# Compute and print metrics
+# Compute
 accuracy  = accuracy_score(all_labels, all_preds)
 precision, recall, f1, _ = precision_recall_fscore_support( # Don't include support
     all_labels, all_preds, average="binary"
