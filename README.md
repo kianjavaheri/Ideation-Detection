@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 Ran on Google Colab with T4 GPU runtime
 ```
-python train_model.py
+python model_training.py
 python evaluate_model.py
 ```
 
