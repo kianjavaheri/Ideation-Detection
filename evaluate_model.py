@@ -4,7 +4,7 @@ from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassific
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
-from tqdm.auto import tqdm
+from tqdm.auto import tqdm # Progress bar for loops
 
 # Force CPU only
 # May cause issues on Apple Silicon or other machines (but works on Colab)
@@ -28,7 +28,7 @@ class TextClassificationDataset(Dataset):
 csv_path = "mapped_dataset.csv"
 df = (
     pd.read_csv(csv_path, engine="python", on_bad_lines="skip")
-      .sample(frac=0.1, random_state=42)               # 10% of your full data
+      .sample(frac=0.1, random_state=42)
 )
 
 # Original 70/15/15 split
@@ -47,34 +47,42 @@ small_encodings = tokenizer(
     truncation=True,
     return_tensors="pt"
 )
-small_labels   = small_test_df["class"].tolist()
-small_dataset  = TextClassificationDataset(small_encodings, small_labels)
+small_labels = small_test_df["class"].tolist()
+small_dataset = TextClassificationDataset(small_encodings, small_labels)
 
 # Load trained model
 model = DistilBertForSequenceClassification.from_pretrained("results/checkpoint-500")
 model.to(device).eval()
 
 # Inference
+# Creates a batch loader for the small dataset
 loader = DataLoader(small_dataset, batch_size=64, shuffle=False)
 
+# Storage for predictions and labels
 all_preds = []
 all_labels = []
 
+
+# Disables gradient calculations for inference
 with torch.no_grad():
+    # TQDM progress bar for the evaluation loop
     for batch in tqdm(loader, desc="Quick eval (1k samples)"):
-        input_ids      = batch["input_ids"].to(device)
+        # Encodings and labels to device
+        input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
-        labels         = batch["labels"].to(device)
+        labels = batch["labels"].to(device)
 
+        # Forward pass
         logits = model(input_ids, attention_mask=attention_mask).logits
-        preds  = logits.argmax(dim=1)
+        preds = logits.argmax(dim=1)
 
+        # Store predictions and labels
         all_preds.extend(preds.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
 
 # Compute and print metrics
 accuracy  = accuracy_score(all_labels, all_preds)
-precision, recall, f1, _ = precision_recall_fscore_support(
+precision, recall, f1, _ = precision_recall_fscore_support( # Don't include support
     all_labels, all_preds, average="binary"
 )
 

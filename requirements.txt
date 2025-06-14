@@ -1,0 +1,17 @@
+# Data handling
+pandas==2.2.3
+
+# Machine learning & metrics
+scikit-learn==1.6.1
+
+# Core DL framework
+torch==2.6.0
+
+# Hugging Face Transformers (includes tokenizers)
+transformers==4.51.1
+
+# Hugging Face Accelerate for Trainer backend
+accelerate>=0.26.0
+
+# Progress bars (optional, for evaluate_model.py)
+tqdm>=4.67.1
