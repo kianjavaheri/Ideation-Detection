@@ -30,8 +30,7 @@ class TextClassificationDataset(Dataset): # Inherits from PyTorch's Dataset clas
 def main ():
     csv_path = "mapped_dataset.csv"
     # use the python engine and skip any rows with tokenization errors
-    df = (
-    pd.read_csv(csv_path, engine="python", on_bad_lines="skip").sample(frac=0.1, random_state=42))
+    df = (pd.read_csv(csv_path, engine="python", on_bad_lines="skip").sample(frac=0.1, random_state=42))
 
     # Split the data
     train_df, temp_df = train_test_split(df, test_size=0.3, stratify=df['class'], random_state=42)
